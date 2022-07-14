@@ -12,28 +12,45 @@ const GH_URL = `https://github.com/${OWNER}/${REPO}/commit/`;
 const START_OF_DAY = moment().subtract(1, "days").startOf("day").toString();
 const END_OF_DAY = moment().subtract(1, "days").endOf("day").toString();
 
-
 const createGHURL = (hash) => `${GH_URL}${hash}`;
 
 // get commits from the day
 const getCommits = async () => {
-  console.log(`Commits from **${START_OF_DAY}** to **${END_OF_DAY}** for **${AUTHOR}** from [**${OWNER}/${REPO}**](${GH_URL.replace('/commit', '')})`);
+  console.log(
+    `Commits from **${START_OF_DAY}** to **${END_OF_DAY}** for **${AUTHOR}** from [**${OWNER}/${REPO}**](${GH_URL.replace(
+      "/commit",
+      ""
+    )})`
+  );
   const gitLog = spawn("git", [
     "log",
     `--after=${START_OF_DAY}`,
     `--before=${END_OF_DAY}`,
-    `--author=${AUTHOR}`
+    `--author=${AUTHOR}`,
   ]);
+  console.log(
+    `Running: git log --after=${START_OF_DAY} --before=${END_OF_DAY} --author=${AUTHOR}`
+  );
+
   gitLog.stdout.on("data", (data) => {
     const commits = data.toString().split("\n\n\n");
+
     commits.forEach((commit) => {
-      const commitLine = commit.trim().split("\n")[0];
+      const commitArr = commit.trim().split("\n");
+      const commitLine = commitArr[0];
+      const message = commitArr[commitArr.length - 1].trim();
       const hash = commitLine.split(" ")[1];
       const url = createGHURL(hash);
-      console.log(url);
+      console.log(`[${message}](${url})`);
     });
-  });  
-};
+  });
 
+  var cleanExit = function () {
+    process.exit();
+  };
+  
+  process.on("SIGINT", cleanExit); // catch ctrl-c
+  process.on("SIGTERM", cleanExit); // catch kill
+};
 
 getCommits();
