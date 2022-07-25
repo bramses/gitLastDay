@@ -9,8 +9,8 @@ const AUTHOR = process.env.AUTHOR || process.argv[4];
 
 const GH_URL = `https://github.com/${OWNER}/${REPO}/commit/`;
 
-const START_OF_DAY = moment().subtract(0, "days").startOf("day").toString();
-const END_OF_DAY = moment().subtract(0, "days").endOf("day").toString();
+const START_OF_DAY = moment().subtract(1, "days").startOf("day").toString();
+const END_OF_DAY = moment().subtract(1, "days").endOf("day").toString();
 
 const createGHURL = (hash) => `${GH_URL}${hash}`;
 
